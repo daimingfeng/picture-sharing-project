@@ -8,7 +8,6 @@ define('version',default='0.0.1',help='version0.0.1',type=str)
 
 class Application(tornado.web.Application):
     def __init__(self):
-
         handlers = [
             ('/',main.IndexHandler),
             (r'/exp',main.ExploreHandler),
