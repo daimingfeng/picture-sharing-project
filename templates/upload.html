@@ -1,0 +1,18 @@
+{% extends base.html %}
+{% block title %}Home page{% end %}
+{% block style %}
+
+#box{
+    background:yellow;
+    width:200px;
+    height:200px;
+}
+{% end %}
+{% block body1 %}
+<div id="box">
+    <form action="/upload" enctype="multipart/form-data" method="post">
+    <input type="file" name="newfile">
+    <input type="submit">
+</form>
+</div>
+{% end %}

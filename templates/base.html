@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Title{% end %}</title>
+    <style>
+        {% block style %}
+        *{
+            padding: 0px;
+            margin: 0px;
+        }
+        {% end %}
+    </style>
 </head>
 <body>
     {% block body1 %}

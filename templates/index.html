@@ -2,7 +2,7 @@
 {% block title %}Home page{% end %}
 {% block body1 %}
 Hello welcome to my web
-{% for i in range(1,4) %}
-<img src="{{ static_url('image/3{}.jpg'.format(i)) }}" alt="">
+{% for i in filepath %}
+<img src="{{ i }}" alt="" width="200px" >
 {% end %}
 {% end %}

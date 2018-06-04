@@ -11,7 +11,8 @@ class Application(tornado.web.Application):
         handlers = [
             ('/',main.IndexHandler),
             (r'/exp',main.ExploreHandler),
-            (r'/post/(?P<post_id>[0-9]+)',main.PostHandler),
+            (r'/post/(?P<post_name>.*)',main.PostHandler),
+            (r'/upload',main.UploadHandler),
         ]
         settings = dict(
             template_path = 'templates',
@@ -26,5 +27,5 @@ application = Application()
 if __name__ == '__main__':
     tornado.options.parse_command_line()
     application.listen(options.port)
-    print('Sever start on port{}'.format(str(options.port)))
+    print('Sever start on port {}'.format(str(options.port)))
     tornado.ioloop.IOLoop.current().start()
