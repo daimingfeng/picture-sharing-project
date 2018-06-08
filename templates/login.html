@@ -1,0 +1,14 @@
+{% extends base.html %}
+{% block title %}login{% end %}
+{% block body1 %}
+    <div id="box" style="width: 300px;height: 200px;margin:100px auto ;background: aquamarine" >
+    <form action="/login?next={{ nextname }}" method="post" style="text-align: center;">
+        账户：<input type="text" name="username" style="margin: 20px auto"> <br>
+        密码：<input type="password" name="passwd"> <br>
+        <input type="submit" style="margin: 20px auto">
+        <button><a href="/register" >注册</a></button>
+    </form>
+    </div>
+{% end %}
+
+
