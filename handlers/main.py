@@ -2,9 +2,8 @@ import tornado.web
 import os
 import glob
 from tornado.web import authenticated
-#from pycket import session
 from pycket.session import SessionMixin
-from PIL import Image
+from utlis import register,hash_it,add_post_for,get_post_for
 class BaseHandler(tornado.web.RequestHandler,SessionMixin):
     def get_current_user(self):
         current_user = self.session.get('user')
@@ -18,10 +17,11 @@ class IndexHandler(BaseHandler):
     '''
     @authenticated
     def get(self, *args, **kwargs):
-        img_path = os.path.join(self.settings.get('static_path'),'newfile')
-        filepath = glob.glob('{}/*.jpg'.format(img_path))
-        print(filepath)
-        self.render('index.html',filepath = filepath)
+        # img_path = os.path.join(self.settings.get('static_path'),'newfile')
+        # filepath = glob.glob('{}/*.jpg'.format(img_path))
+        # print(filepath)
+        img_urls = get_post_for(self.current_user)
+        self.render('index.html',filepath = img_urls)
 
 class ExploreHandler(BaseHandler):
     '''
@@ -38,6 +38,7 @@ class PostHandler(BaseHandler):
     '''
     personal page
     '''
+    @authenticated
     def get(self,post_name):
             self.render('post.html',post_name = post_name)
 
@@ -45,38 +46,47 @@ class UploadHandler(BaseHandler):
     '''
     上传文件
     '''
+    @authenticated
     def get(self, *args, **kwargs):
         self.render('upload.html')
     def post(self, *args, **kwargs):
         from utlis import thumb
-        upload_path = os.path.join(os.path.dirname(__file__),'newfile') # 文件暂存的路径
-        print(upload_path)
+        upload_dir_path =self.settings.get('static_path')
+        print(upload_dir_path)
         file_n = self.request.files['newfile']
-        print(file_n[0]['filename'])# 提取表单中'name'为'newfile'的文件数据
         for a in file_n:
             filename = a['filename']
             print(filename)
-            filepath = os.path.join('/home/pyvip/img_sharing/static/newfile',filename)
+            filepath = os.path.join(self.settings.get('static_path'),'newfile',filename)
+            print(filepath)
             with open(filepath,'wb') as f:
                 f.write(a['body'])
-        thumb(filepath,file_n)
+            add_post_for(self.current_user,filepath)
+            thumb(filepath,upload_dir_path)
         self.write('ok')
+        self.redirect('/exp')
+
 class LoginHandler(BaseHandler):
     def get(self, *args, **kwargs):
         nextname = self.get_argument('next','')
         self.render('login.html',nextname = nextname)
     def post(self, *args, **kwargs):
-        from utlis import user_info
+        from utlis import get_user_info
         '''获取表单提交信息'''
         nextname = self.get_argument('next','')
         username = self.get_argument('username','')
         passwd = self.get_argument('passwd','')
+        hash_pass = hash_it(passwd)
         '''验证信息'''
         if username:
-            if username == user_info['username'] and passwd == user_info['passwd']:
+            user_info = get_user_info(username)
+            if username == user_info.name and hash_pass == user_info.password:
                 self.session.set('user',username)
-                print(nextname)
-                self.redirect(nextname)
+                #print(nextname)
+                if nextname:
+                    self.redirect(nextname)
+                else:
+                    self.redirect('/')
             else:
                 self.write('账号或密码错误')
         else:
@@ -90,17 +100,23 @@ class LogoutHandler(BaseHandler):
 class RegisterHandler(BaseHandler):
 
     def get(self, *args, **kwargs):
-        self.render('register.html')
+        self.render('register.html',msg ='')
 
     def post(self, *args, **kwargs):
-        from utlis import user_info
         username = self.get_argument('username','')
         passwd1 = self.get_argument('passwd1','')
         passwd2 = self.get_argument('passwd2','')
-        email = self.get_argument('email','')
+        #email = self.get_argument('email','')
         if username and passwd1 and passwd2:
             if passwd1 != passwd2:
                 self.write('两次输入的密码不一致')
             else:
-                pass
+                ret = register(username,passwd1)
+                if ret['msg'] =='ok':
+                    self.session.set('user',username)
+                    self.redirect('/')
+                else:
+                    self.write(ret)
+        else:
+            self.render('register.html',msg={'register':'fail'})
 

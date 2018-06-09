@@ -2,7 +2,10 @@
 {% block title %}sign up{% end %}
 {% block body1 %}
     <div id="box" style="width: 300px;height: 200px;margin:100px auto ;background: #fff674" >
-    <form action="/register" method="post" style="text-align: center;">
+    {% if msg %}
+        <p>{{ msg }}</p>
+     {% end %}
+        <form action="/register" method="post" style="text-align: center;">
         账户：<input type="text" name="username" style="margin:10px  auto 0 auto"> <br>
         密码：<input type="password" name="passwd1"> <br>
         重复密码：<input type="password" name="passwd2"> <br>
