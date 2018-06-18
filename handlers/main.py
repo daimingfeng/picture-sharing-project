@@ -3,7 +3,7 @@ import os
 import glob
 from tornado.web import authenticated
 from pycket.session import SessionMixin
-from utlis import register,hash_it,add_post_for,get_post_for
+from utlis import register,hash_it,add_post_for,get_post_for,Upload
 class BaseHandler(tornado.web.RequestHandler,SessionMixin):
     def get_current_user(self):
         current_user = self.session.get('user')
@@ -51,18 +51,21 @@ class UploadHandler(BaseHandler):
         self.render('upload.html')
     def post(self, *args, **kwargs):
         from utlis import thumb
-        upload_dir_path =self.settings.get('static_path')
-        print(upload_dir_path)
-        file_n = self.request.files['newfile']
+        static_path  = self.settings.get('static_path')
+        #print(upload_dir_path)
+        file_n = self.request.files.get('newfile',None)
+        #print(file_n)
         for a in file_n:
             filename = a['filename']
-            print(filename)
-            filepath = os.path.join(self.settings.get('static_path'),'newfile',filename)
-            print(filepath)
-            with open(filepath,'wb') as f:
-                f.write(a['body'])
-            add_post_for(self.current_user,filepath)
-            thumb(filepath,upload_dir_path)
+            saver = Upload(static_path,filename)
+            #print(filename)
+            saver.save_img(a['body'])
+            # filepath = os.path.join(self.settings.get('static_path'),'newfile',filename)
+            # print(filepath)
+            # with open(filepath,'wb') as f:
+            #     f.write(a['body'])
+            add_post_for(self.current_user,saver.upload_path)
+            saver.thumb()
         self.write('ok')
         self.redirect('/exp')
 
