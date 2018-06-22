@@ -1,5 +1,6 @@
 {% extends base.html %}
-{% block title %}Home page{% end %}
+{% block title %}Post{% end %}
 {% block body1 %}
-<img src="{{ static_url('newfile/{}.jpg'.format(post_name)) }}" alt="">
+<img src="{{ static_url(img_url) }}" alt="">
+<h5>{{ '上传用户：{} 上传时间：{}'.format(username_created[0],username_created[1])}}</h5>
 {% end %}

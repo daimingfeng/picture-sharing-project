@@ -2,17 +2,21 @@
 {% block title %}Home page{% end %}
 {% block style %}
 
-#box{
-    background:yellow;
-    width:200px;
-    height:200px;
-}
+
 {% end %}
 {% block body1 %}
-<div id="box">
+<div class="container">
     <form action="/upload" enctype="multipart/form-data" method="post">
-    <input type="file" name="newfile">
-    <input type="submit">
-</form>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">上传文件</span>
+            </div>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="inputGroupFile01" name="newfile">
+                <label class="custom-file-label" for="inputGroupFile01">选择文件</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
 </div>
 {% end %}

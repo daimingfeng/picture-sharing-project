@@ -3,7 +3,7 @@ import os
 import glob
 from tornado.web import authenticated
 from pycket.session import SessionMixin
-from utlis import register,hash_it,add_post_for,get_post_for,Upload
+from utlis import register,hash_it,add_post_for,get_post_for,Upload,get_thumb_url,get_img_url,get_post_username_created
 class BaseHandler(tornado.web.RequestHandler,SessionMixin):
     def get_current_user(self):
         current_user = self.session.get('user')
@@ -21,7 +21,8 @@ class IndexHandler(BaseHandler):
         # filepath = glob.glob('{}/*.jpg'.format(img_path))
         # print(filepath)
         img_urls = get_post_for(self.current_user)
-        self.render('index.html',filepath = img_urls)
+        username = self.current_user
+        self.render('index.html',filepath = img_urls,username=username,)
 
 class ExploreHandler(BaseHandler):
     '''
@@ -29,18 +30,20 @@ class ExploreHandler(BaseHandler):
     '''
     @authenticated
     def get(self, *args, **kwargs):
-        img_path = os.path.join(self.settings.get('static_path'),'newfile_thumbnail')
-        filepath = glob.glob('{}/*.jpg'.format(img_path))
+        thumb_urls = get_thumb_url()
         #print(filepath)
-        self.render('explore.html',filepath = filepath)
+        self.render('explore.html',thumb_urls = thumb_urls)
 
 class PostHandler(BaseHandler):
     '''
     personal page
     '''
     @authenticated
-    def get(self,post_name):
-            self.render('post.html',post_name = post_name)
+    def get(self,post_id):
+        post_id = int(post_id)
+        img_url = get_img_url(post_id)
+        username_created = get_post_username_created(post_id)
+        self.render('post.html',img_url = img_url,username_created=username_created)
 
 class UploadHandler(BaseHandler):
     '''
@@ -50,21 +53,13 @@ class UploadHandler(BaseHandler):
     def get(self, *args, **kwargs):
         self.render('upload.html')
     def post(self, *args, **kwargs):
-        from utlis import thumb
         static_path  = self.settings.get('static_path')
-        #print(upload_dir_path)
         file_n = self.request.files.get('newfile',None)
-        #print(file_n)
         for a in file_n:
             filename = a['filename']
             saver = Upload(static_path,filename)
-            #print(filename)
             saver.save_img(a['body'])
-            # filepath = os.path.join(self.settings.get('static_path'),'newfile',filename)
-            # print(filepath)
-            # with open(filepath,'wb') as f:
-            #     f.write(a['body'])
-            add_post_for(self.current_user,saver.upload_path)
+            add_post_for(self.current_user,saver.upload_url,saver.thumb_url)
             saver.thumb()
         self.write('ok')
         self.redirect('/exp')
@@ -85,7 +80,6 @@ class LoginHandler(BaseHandler):
             user_info = get_user_info(username)
             if username == user_info.name and hash_pass == user_info.password:
                 self.session.set('user',username)
-                #print(nextname)
                 if nextname:
                     self.redirect(nextname)
                 else:
@@ -97,8 +91,9 @@ class LoginHandler(BaseHandler):
 
 class LogoutHandler(BaseHandler):
     def get(self):
+        nextname = self.get_argument('next', '')
         self.session.set('user','')
-        self.render('login.html')
+        self.render('login.html',nextname=nextname)
 
 class RegisterHandler(BaseHandler):
 

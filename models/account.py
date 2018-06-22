@@ -36,13 +36,16 @@ class Post(Base):
     id = Column(Integer,primary_key=True,autoincrement=True)
     img_url = Column(String(80))
     user_id = Column(Integer,ForeignKey('users.id'))
+    thumb_url = Column(String(80))
+    created = Column(DateTime, default=datetime.now)
     user = relationship('User',backref = 'post',uselist=False,cascade='all')
+
 
     def __repr__(self):
         return "<post(#){}>".format(self.id)
     @classmethod
-    def add(cl,user,img_url):
-        img_info = Post(user=user,img_url=img_url)
+    def add(cls,user,img_url,thumb_url):
+        img_info = Post(user=user,img_url=img_url,thumb_url=thumb_url)
         session.add(img_info)
         session.commit()
 

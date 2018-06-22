@@ -1,8 +1,7 @@
 {% extends base.html %}
-{% block title %}Home page{% end %}
+{% block title %}发现{% end %}
 {% block body1 %}
-{% for i in filepath %}
-{{ i }}
-<img src="{{ i }}" alt="">
+{% for i in thumb_urls %}
+<a href="/post/{{ i[0] }}"><img src="{{ static_url(i[1]) }}" alt=""></a>
 {% end %}
 {% end %}

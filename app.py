@@ -12,7 +12,7 @@ class Application(tornado.web.Application):
         handlers = [
             ('/',main.IndexHandler),
             (r'/exp',main.ExploreHandler),
-            (r'/post/(?P<post_name>.*)',main.PostHandler),
+            (r'/post/(?P<post_id>.*)',main.PostHandler),
             (r'/upload',main.UploadHandler),
             (r'/logout', main.LogoutHandler),
             (r'/login',main.LoginHandler),
@@ -35,8 +35,7 @@ class Application(tornado.web.Application):
                     'max_connections': 2 ** 31,
                 },
                 'cookies': {
-                    'expires_days': 60,
-                    'max_age': 100,
+                    'expires_days': 1,
                 }
             }
             )

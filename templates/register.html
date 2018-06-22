@@ -1,17 +1,39 @@
 {% extends base.html %}
 {% block title %}sign up{% end %}
 {% block body1 %}
-    <div id="box" style="width: 300px;height: 200px;margin:100px auto ;background: #fff674" >
     {% if msg %}
         <p>{{ msg }}</p>
      {% end %}
         <form action="/register" method="post" style="text-align: center;">
-        账户：<input type="text" name="username" style="margin:10px  auto 0 auto"> <br>
-        密码：<input type="password" name="passwd1"> <br>
-        重复密码：<input type="password" name="passwd2"> <br>
-        邮箱：<input type="text" name="email"></input><br>
-        <input type="submit" style="margin: 20px auto"><br>
-        已有账户请<a href="/login">登录</a>
-    </form>
+    <div class="container co1-lg" style="width: 800px;margin: 200px auto">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">账户</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Account" name="username" aria-label="账户">
     </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" >密码</span>
+        </div>
+        <input type="password" class="form-control" placeholder="Password1" name="passwd1" aria-label="密码">
+    </div>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">重复密码</span>
+        </div>
+        <input type="password" class="form-control" placeholder="Password2" name="passwd2" aria-label="重复密码">
+    </div>
+        <div class="input-group mb-3" >
+            <div class="input-group-prepend">
+            <span class="input-group-text" >Email</span>
+            </div>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        </div>
+            <div class="input-group mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <span class="input-group-text">已有账户请<a href="/login">登录</a></span>
+        </div>
+    </div>
+        </form>
 {% end %}

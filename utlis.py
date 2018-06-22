@@ -1,6 +1,7 @@
 import os
 import glob
 import hashlib
+import uuid
 from os.path import dirname
 from models.account import User,Post
 from PIL import Image
@@ -9,31 +10,83 @@ from models.db import Base
 from models.account import session
 
 def hash_it(password):
+    '''
+    密码加密
+    :param password:
+    :return:
+    '''
     return hashlib.md5(password.encode('utf8')).hexdigest()
 
 def get_user_info(username):
     user_info = User.query(username)
     return user_info
 
-
 def register(username,password):
+    """
+    注册
+    :param username:
+    :param password:
+    :return:
+    """
     if User.is_exists(username):
         return {'msg':username}
     hash_pass = hash_it(password)
     User.add(username,hash_pass)
     return {'msg':'ok'}
 
-def add_post_for(username,img_url):
+def add_post_for(username,img_url,thumb_url):
+    """
+    posts表增加数据
+    :param username:
+    :param img_url:
+    :param thumb_url:
+    :return:
+    """
     user = User.query(username)
-    Post.add(img_url=img_url,user=user)
+    Post.add(img_url=img_url,user=user,thumb_url=thumb_url)
 
 def get_post_for(username):
+        """
+        通过用户名获取图片地址及时间
+        :param username:
+        :return:
+        """
         user = session.query(User).filter_by(name=username).first()
         posts =session.query(Post).filter_by(user=user)
         ret =[]
         for p in posts:
-            ret.append(p.img_url)
+            ret.append((p.img_url,p.created))
         return ret
+def get_post_username_created(post_id):
+    """
+    通过id获取用户名及时间
+    :param post_id:
+    :return:
+    """
+    p = session.query(Post).filter_by(id=post_id).first()
+    ret = [p.user.name,p.created]
+    print(ret)
+    return ret
+
+
+def get_thumb_url():
+    """
+    通过id获取缩略图地址
+    :return:
+    """
+    thumb_urls = session.query(Post).order_by(Post.id.desc()).all()
+    ret = []
+    for p in thumb_urls:
+        ret.append((p.id,p.thumb_url))
+    print(ret)
+    return ret
+def get_img_url(post_id):
+    """通过id获取图片地址"""
+    print(post_id)
+    p = session.query(Post).filter_by(id=post_id).first()
+    print(p)
+    img_url = p.img_url
+    return img_url
 
 class Upload:
     '''
@@ -50,9 +103,10 @@ class Upload:
         '''
         self.static_path = static_path
         self.file_name = file_name
+        self.newname = self.get_newname()
     @property
     def upload_url(self):
-        return os.path.join(self.upfile_dir,self.file_name)
+        return os.path.join(self.upfile_dir,self.newname)
     @property
     def upload_path(self):
         '''
@@ -68,14 +122,25 @@ class Upload:
         '''
         with open(self.upload_path,'wb') as f:
             f.write(content)
+    def get_newname(self):
+        """
+        生成一个唯一的图片名
+        :param filename: 上传图片的名字
+        :return:
+        """
+        _,ext = os.path.splitext(self.file_name)
+        return uuid.uuid4().hex + ext
+    @property
+    def thumb_url(self):
+        base,_ =os.path.splitext(self.newname)
+        return os.path.join(self.thumb_dir,'{}_{}x{}.jpg'.format(base,self.size[0],self.size[1]))
     @property
     def thumb_path(self):
         '''
         返回缩略图保存地址
         :return:
         '''
-        base,_ = os.path.splitext(self.file_name)
-        return os.path.join(self.static_path,self.thumb_dir,'{}_{}x{}.jpg'.format(base,self.size[0],self.size[1]))
+        return os.path.join(self.static_path,self.thumb_url,)
     def thumb(self):
         '''
         创建缩略图操作

@@ -1,8 +1,16 @@
 {% extends base.html %}
 {% block title %}Home page{% end %}
 {% block body1 %}
-Hello! welcome to you!
 {% for i in filepath %}
-<img src="{{ i }}" alt="" width="200px" >
+<div class="row justify-content-center">
+    <div class="col col-sm-2"></div>
+    <div class="col col-sm-6">
+    <img src="{{ static_url(i[0]) }}" alt="" width="600px" >
+        {{ i[1] }}
+        </div>
+    <div class="col col-sm-4">
+</div>
+
+</div>
 {% end %}
 {% end %}
