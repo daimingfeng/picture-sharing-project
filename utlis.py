@@ -43,7 +43,10 @@ def add_post_for(username,img_url,thumb_url):
     :return:
     """
     user = User.query(username)
-    Post.add(img_url=img_url,user=user,thumb_url=thumb_url)
+    post = Post(img_url=img_url,user=user,thumb_url=thumb_url)
+    session.add(post)
+    session.commit()
+    return post
 
 def get_post_for(username):
         """

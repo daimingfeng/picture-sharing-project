@@ -3,7 +3,7 @@ import tornado.ioloop
 import tornado.options
 from pycket.session import SessionMixin
 from tornado.options import define,options
-from handlers import main
+from handlers import main,chat,service
 define('port',default=8000,help='run port',type=int)
 define('version',default='0.0.1',help='version0.0.1',type=str)
 
@@ -17,6 +17,9 @@ class Application(tornado.web.Application):
             (r'/logout', main.LogoutHandler),
             (r'/login',main.LoginHandler),
             (r'/register',main.RegisterHandler),
+            (r'/room',chat.RoomHandler),
+            (r'/ws',chat.ChatSocketHandler),
+            (r'/save',service.ImageSaveHandler),
 
         ]
         settings = dict(
