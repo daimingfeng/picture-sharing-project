@@ -48,7 +48,33 @@ class Post(Base):
         img_info = Post(user=user,img_url=img_url,thumb_url=thumb_url)
         session.add(img_info)
         session.commit()
+class Like(Base):
+    __tablename__ = 'likes'
 
+    user_id = Column(Integer,ForeignKey('users.id'),primary_key=True)
+    post_id = Column(Integer,ForeignKey('posts.id'),primary_key=True)
+
+    def __repr__(self):
+        return '<like(#) user_id:{} post_id:{}>'.format(self.user_id,self.post_id)
+
+    @classmethod
+    def is_exist(cls,user_id,post_id):
+        """判断数据是否存在（用户是否已关注，返回True就是已关注）"""
+        p = session.query(Like).filter_by(user_id=user_id).all()
+        for i in p:
+            if i.post_id == post_id:
+                return True
+        return False
+    @classmethod
+    def add(cls,user_id,post_id):
+        likes_info = Like(user_id=user_id,post_id=post_id)
+        session.add(likes_info)
+        session.commit()
+    @classmethod
+    def drop(cls,user_id,post_id):
+        rows = session.query(Like).filter_by(user_id=user_id,post_id=post_id).first()
+        session.delete(rows)
+        session.commit()
 
 if __name__ == '__main__':
     Base.metadata.create_all()

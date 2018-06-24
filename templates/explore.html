@@ -1,7 +1,12 @@
 {% extends base.html %}
 {% block title %}发现{% end %}
 {% block body1 %}
-{% for i in thumb_urls %}
-<a href="/post/{{ i[0] }}"><img src="{{ static_url(i[1]) }}" alt=""></a>
-{% end %}
+<div class="p-3 mb-2 bg-info text-white"style="text-align: center"><h1>所有用户上传</h1></div>
+<div class="card">
+    <div class="card-body" style="float: top">
+    {% for i in thumb_urls %}
+    <a href="/post/{{ i[0] }}"><img src="{{ static_url(i[1]) }}" alt="" class="rounded "style="border:3px solid #dee2e6"></a>
+    {% end %}
+    </div>
+</div>
 {% end %}

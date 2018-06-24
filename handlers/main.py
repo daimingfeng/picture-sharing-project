@@ -1,9 +1,11 @@
 import tornado.web
+import json
 import os
 import glob
+import re
 from tornado.web import authenticated
 from pycket.session import SessionMixin
-from utlis import register,hash_it,add_post_for,get_post_for,Upload,get_thumb_url,get_img_url,get_post_username_created
+from utlis import register,hash_it,add_post_for,get_post_for,Upload,get_thumb_url,get_img_url,get_post_username_created,add_id_for_likes,get_user_like_img,img_count,is_exist,drop
 class BaseHandler(tornado.web.RequestHandler,SessionMixin):
     def get_current_user(self):
         current_user = self.session.get('user')
@@ -43,8 +45,22 @@ class PostHandler(BaseHandler):
         post_id = int(post_id)
         img_url = get_img_url(post_id)
         username_created = get_post_username_created(post_id)
-        self.render('post.html',img_url = img_url,username_created=username_created)
-
+        counts = img_count(post_id)
+        result = is_exist(username=self.current_user, post_id=post_id)
+        self.render('post.html',img_url = img_url,username_created=username_created,post_id=post_id,counts=counts,result=result)
+    def post(self, *args, **kwargs):
+        username = self.current_user
+        request = self.request.full_url()
+        res = re.findall(r'[0-9]+$',request)
+        pos = int(res[0])
+        #print(pos)
+        post_id = int(pos)
+        result = is_exist(username=username, post_id=post_id)
+        if result==False:
+            add_id_for_likes(username,post_id)
+        else:
+            drop(username=self.current_user, post_id=post_id)
+        self.redirect('/profile')
 class UploadHandler(BaseHandler):
     '''
     上传文件
@@ -118,3 +134,9 @@ class RegisterHandler(BaseHandler):
         else:
             self.render('register.html',msg={'register':'fail'})
 
+class ProfileHandler(BaseHandler):
+    def get(self):
+        img_urls = get_post_for(self.current_user)
+        username = self.current_user
+        img_urls_list = get_user_like_img(username)
+        self.render('profile.html',filepath=img_urls, username=username,img_urls=img_urls_list)

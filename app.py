@@ -20,6 +20,7 @@ class Application(tornado.web.Application):
             (r'/room',chat.RoomHandler),
             (r'/ws',chat.ChatSocketHandler),
             (r'/save',service.ImageSaveHandler),
+            (r'/profile',main.ProfileHandler),
 
         ]
         settings = dict(

@@ -1,16 +1,18 @@
 {% extends base.html %}
 {% block title %}Home page{% end %}
 {% block body1 %}
+<div style="text-align: center"><h1>欢迎关注用户图片</h1></div>
+<div class="card">
+    <div class="p-3 mb-2 bg-success text-white"style="text-align: center"><h1>用户上传</h1></div>
 {% for i in filepath %}
-<div class="row justify-content-center">
-    <div class="col col-sm-2"></div>
-    <div class="col col-sm-8">
-    <img src="{{ static_url(i[0]) }}" alt="" width="500px" >
-        <h4>{{ i[1] }}</h4>
+        <div class="row justify-content-center">
+            <div class="col col-sm-2"></div>
+            <div class="col col-sm-8"  >
+                <img src="{{ static_url(i[0]) }}" class="rounded" alt="" width="600px" >
+                <h4>{{ i[1] }}</h4>
+            </div>
+            <div class="col col-sm-2"></div>
         </div>
-    <div class="col col-sm-2">
-</div>
-
-</div>
 {% end %}
+</div>
 {% end %}

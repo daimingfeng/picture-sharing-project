@@ -3,7 +3,7 @@ import glob
 import hashlib
 import uuid
 from os.path import dirname
-from models.account import User,Post
+from models.account import User,Post,Like
 from PIL import Image
 from models.db import DBsession
 from models.db import Base
@@ -55,7 +55,7 @@ def get_post_for(username):
         :return:
         """
         user = session.query(User).filter_by(name=username).first()
-        posts =session.query(Post).filter_by(user=user)
+        posts =session.query(Post).order_by(Post.id.desc()).filter_by(user=user)
         ret =[]
         for p in posts:
             ret.append((p.img_url,p.created))
@@ -77,7 +77,7 @@ def get_thumb_url():
     通过id获取缩略图地址
     :return:
     """
-    thumb_urls = session.query(Post).order_by(Post.id.desc()).all()
+    thumb_urls = session.query(Post).order_by(Post.id.desc()).limit(8)
     ret = []
     for p in thumb_urls:
         ret.append((p.id,p.thumb_url))
@@ -90,6 +90,45 @@ def get_img_url(post_id):
     print(p)
     img_url = p.img_url
     return img_url
+
+def add_id_for_likes(username, post_id):
+    """给likes表添加数据"""
+    p = session.query(User).filter_by(name=username).first()
+    p1 = session.query(Post).filter_by(id=post_id).first()
+    if p.id != p1.user_id:
+        Like.add(user_id=p.id,post_id=post_id)
+    else:
+        return False
+def is_exist(username,post_id):
+    '''判断数据是否存在，返回True代表存在，反之不存在'''
+    p = session.query(User).filter_by(name=username).first()
+    user_id = p.id
+    return Like.is_exist(user_id=user_id,post_id=post_id)
+def drop(username,post_id):
+    """删除likes表数据"""
+    p = session.query(User).filter_by(name=username).first()
+    Like.drop(user_id=p.id,post_id=post_id)
+def get_user_like_img(username):
+    """通过用户名获得用户关注图片的地址"""
+    u = session.query(User).filter_by(name=username).first()
+    #print(u.id)
+    p = session.query(Like).filter_by(user_id=u.id).all()
+    #print(p)
+    ret = []
+    for i in p:
+        print(i.post_id)
+        a = session.query(Post).filter_by(id=i.post_id).first()
+        ret.append(a.img_url)
+    return ret
+
+def img_count(post_id):
+    """记录图片的关注次数"""
+    p = session.query(Like).filter_by(post_id=post_id).all()
+    return len(p)
+
+
+
+
 
 class Upload:
     '''
