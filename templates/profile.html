@@ -9,6 +9,10 @@
             <div class="col col-sm-8" >
                 <img src="{{ static_url(i[0]) }}" class="rounded" alt="" width="600px" >
                 <h4>{{ i[1] }}</h4>
+                <form action="/profile" method="post">
+                <input type="hidden" value="{{ i[2] }}" name="post_id">
+                <button class="btn btn-primary" type="submit">取消上传</button>
+                </form>
             </div>
             <div class="col col-sm-2"></div>
         </div>

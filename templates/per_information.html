@@ -1,0 +1,35 @@
+{% extends base.html %}
+{% block title %}personal information{% end %}
+{% block body1 %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">账户</th>
+      <th scope="col">{{ username }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">性别</th>
+        <td colspan="3">{{ gender }}</td>
+    </tr>
+    <tr>
+      <th scope="row">生日</th>
+        <td colspan="3">{{ birth }}</td>
+    </tr>
+    <tr>
+      <th scope="row">手机</th>
+        <td colspan="3">{{ phone }}</td>
+    </tr>
+    <tr>
+      <th scope="row">email</th>
+      <td colspan="3">{{ email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">介绍</th>
+        <td colspan="3">{{ introduce }}</td>
+    </tr>
+  </tbody>
+</table>
+<button class="btn btn-danger" ><a href="/modify">修改个人信息</a></button>
+{% end%}

@@ -21,6 +21,9 @@ class Application(tornado.web.Application):
             (r'/ws',chat.ChatSocketHandler),
             (r'/save',service.ImageSaveHandler),
             (r'/profile',main.ProfileHandler),
+            (r'/info',main.InformationHandler),
+            (r'/modify',main.ModifyHandler),
+            (r'/test',main.TestajaxHandler),
 
         ]
         settings = dict(

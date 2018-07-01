@@ -2,6 +2,7 @@ import os
 import glob
 import hashlib
 import uuid
+from datetime import datetime,date
 from os.path import dirname
 from models.account import User,Post,Like
 from PIL import Image
@@ -19,7 +20,10 @@ def hash_it(password):
 
 def get_user_info(username):
     user_info = User.query(username)
-    return user_info
+    if user_info:
+        return user_info
+    else:
+        return {'msg':'register first'}
 
 def register(username,password):
     """
@@ -55,10 +59,10 @@ def get_post_for(username):
         :return:
         """
         user = session.query(User).filter_by(name=username).first()
-        posts =session.query(Post).order_by(Post.id.desc()).filter_by(user=user)
+        posts =session.query(Post).order_by(Post.id.desc()).filter_by(user=user,cancel_ud=0)
         ret =[]
         for p in posts:
-            ret.append((p.img_url,p.created))
+            ret.append((p.img_url,p.created,p.id))
         return ret
 def get_post_username_created(post_id):
     """
@@ -77,7 +81,7 @@ def get_thumb_url():
     通过id获取缩略图地址
     :return:
     """
-    thumb_urls = session.query(Post).order_by(Post.id.desc()).limit(8)
+    thumb_urls = session.query(Post).order_by(Post.id.desc()).filter_by(cancel_ud=0).all()
     ret = []
     for p in thumb_urls:
         ret.append((p.id,p.thumb_url))
@@ -126,6 +130,10 @@ def img_count(post_id):
     p = session.query(Like).filter_by(post_id=post_id).all()
     return len(p)
 
+def get_birthday(birth):
+    d = birth.split('-')
+    birth = date(int(d[0]),int(d[1]),int(d[2]))
+    return birth
 
 
 

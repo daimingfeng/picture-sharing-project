@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+</head>
+<body>
+    <div id="box2"><button class="btn btn-danger">test</button></div>
+<script src="{{ static_url('js/Jquery.js') }}"></script>
+<script>
+    $("#box2").click(function(){
+        $.ajax({
+            'url':'/test',
+            'method':'post',
+            'data':{
+                'a':1,
+                'b':2
+            }
+            }).done(function () {
+                alert('successed')
+            }).fail(function () {
+                alert('failed')
+            })
+        });
+</script>
+    <!--<script>-->
+<!--$(function () {-->
+    <!--$('#box2').click(function () {-->
+        <!--$.ajax({-->
+            <!--type: "post",-->
+            <!--dataType: "json",-->
+            <!--url: "/tes",-->
+            <!--data: {-->
+                <!--'a': 1,-->
+                <!--'b': 2-->
+            <!--},-->
+        <!--}).done(function () {-->
+            <!--alert('successed')-->
+        <!--}).fail(function () {-->
+            <!--alert('failed')-->
+        <!--})-->
+    <!--})-->
+<!--})-->
+
+<!--</script>-->
+</body>
+</html>

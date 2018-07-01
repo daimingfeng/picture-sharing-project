@@ -5,7 +5,8 @@ import glob
 import re
 from tornado.web import authenticated
 from pycket.session import SessionMixin
-from utlis import register,hash_it,add_post_for,get_post_for,Upload,get_thumb_url,get_img_url,get_post_username_created,add_id_for_likes,get_user_like_img,img_count,is_exist,drop
+from utlis import get_birthday,register,hash_it,add_post_for,get_post_for,Upload,get_thumb_url,get_img_url,get_post_username_created,add_id_for_likes,get_user_like_img,img_count,is_exist,drop
+from aid_func.account import update,get_rows_in_userdetails,get_rows_in_users,add_rows_for_userdetails,modify_info
 class BaseHandler(tornado.web.RequestHandler,SessionMixin):
     def get_current_user(self):
         current_user = self.session.get('user')
@@ -75,8 +76,8 @@ class UploadHandler(BaseHandler):
             filename = a['filename']
             saver = Upload(static_path,filename)
             saver.save_img(a['body'])
-            add_post_for(self.current_user,saver.upload_url,saver.thumb_url)
             saver.thumb()
+            add_post_for(self.current_user,saver.upload_url,saver.thumb_url)
         self.write('ok')
         self.redirect('/exp')
 
@@ -94,14 +95,17 @@ class LoginHandler(BaseHandler):
         '''验证信息'''
         if username:
             user_info = get_user_info(username)
-            if username == user_info.name and hash_pass == user_info.password:
-                self.session.set('user',username)
-                if nextname:
-                    self.redirect(nextname)
-                else:
-                    self.redirect('/')
+            if user_info == { 'msg':'register first'}:
+                self.write(user_info)
             else:
-                self.write('账号或密码错误')
+                if username == user_info.name and hash_pass == user_info.password:
+                    self.session.set('user',username)
+                    if nextname:
+                        self.redirect(nextname)
+                    else:
+                        self.redirect('/')
+                else:
+                    self.write('账号或密码错误')
         else:
             self.write('账号或密码错误')
 
@@ -117,6 +121,7 @@ class RegisterHandler(BaseHandler):
         self.render('register.html',msg ='')
 
     def post(self, *args, **kwargs):
+        from datetime import datetime,date
         username = self.get_argument('username','')
         passwd1 = self.get_argument('passwd1','')
         passwd2 = self.get_argument('passwd2','')
@@ -128,6 +133,8 @@ class RegisterHandler(BaseHandler):
                 ret = register(username,passwd1)
                 if ret['msg'] =='ok':
                     self.session.set('user',username)
+                    birth = date(2018,1,1)
+                    add_rows_for_userdetails(username=self.current_user, email='', phone='', birth=birth, gender=1,introduce='lazy')
                     self.redirect('/')
                 else:
                     self.write(ret)
@@ -140,3 +147,54 @@ class ProfileHandler(BaseHandler):
         username = self.current_user
         img_urls_list = get_user_like_img(username)
         self.render('profile.html',filepath=img_urls, username=username,img_urls=img_urls_list)
+    def post(self, *args, **kwargs):
+        post_id = self.get_arguments('post_id')
+        update(post_id)
+        self.redirect('/profile')
+class InformationHandler(BaseHandler):
+    @authenticated
+    def get(self):
+        username = self.current_user
+        ud_row = get_rows_in_userdetails(username)
+        if ud_row.gender:
+            gender = '男'
+        else:
+            gender = '女'
+        self.render('per_information.html',username=username,email=ud_row.email,phone=ud_row.phone,gender=gender,introduce=ud_row.introduce,birth=ud_row.birth)
+        #self.render('input_info.html')
+
+    def post(self, *args, **kwargs):
+        email =self.get_argument('email','')
+        phone = self.get_argument('phone','')
+        birth = self.get_argument('birth','')
+        gender = self.get_argument('customRadio','')
+        introduce = self.get_argument('introduce','')
+        #print(email,phone,birth,gender,introudce)
+        add_rows_for_userdetails(username=self.current_user,email=email,phone=phone,birth=birth,gender=int(gender),introduce=introduce)
+        self.redirect('/info')
+class ModifyHandler(BaseHandler):
+    @authenticated
+    def get(self):
+        self.render('input_info.html')
+    def post(self, *args, **kwargs):
+        ud_row = get_rows_in_userdetails(self.current_user)
+        email = self.get_argument('email', ud_row.email)
+        phone = self.get_argument('phone', ud_row.phone)
+        birth = self.get_argument('birth', ud_row.birth)
+        birth = get_birthday(birth)
+        gender = self.get_argument('customRadio', ud_row.gender)
+        introduce = self.get_argument('introduce', ud_row.introduce)
+        print(birth,gender)
+        modify_info(username=self.current_user,email=email,phone=phone,birth=birth,gender=int(gender),introduce=introduce)
+        self.redirect('/info')
+
+class TestajaxHandler(BaseHandler):
+    def get(self):
+        self.render('test.html')
+    def post(self):
+        a = self.get_argument('a','')
+        b = self.get_argument('b','')
+        resp = """Content-Type: text/json;charset=GBK
+                {"name":"xiaopo","age":"18"}
+            """
+        print(a,b)
