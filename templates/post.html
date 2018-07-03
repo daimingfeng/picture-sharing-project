@@ -1,18 +1,39 @@
 {% extends base.html %}
 {% block title %}Post{% end %}
 {% block body1 %}
-<img src="{{ static_url(img_url) }}" alt="">
-<h5><i class="fa fa-user" aria-hidden="true"></i> 上传用户：{{ username_created[0] }}<br> <i class="fa fa-clock-o" aria-hidden="true"></i> 上传时间：{{ username_created[1] }}<br>
-<i class="fa fa-heart" aria-hidden="true" style="color: red"></i>  关注人数：{{ counts }}</h5>
-<div id="box">
-    {% if result==False %}
-    <form action="/post/{{ post_id }}" method="post" >
-        <button class="btn btn-success" type="submit">关注</button>
-    </form>
-    {% else %}
-    <form action="/post/{{ post_id }}" method="post">
-        <button class="btn btn-danger" type="submit">取消关注</button>
-    </form>
-    {% end %}
+<div class="container">
+    <div class="col-sm-12 card border" style="text-align: center;">
+        <span><img src="{{ static_url(img_url) }}" width="300px" style="margin-top: 10px" alt=""></span>
+        <ul>
+            <li type="none"><i class="fa fa-user" aria-hidden="true"></i> 上传用户：{{ username_created[0] }}<br> <i
+                    class="fa fa-clock-o" aria-hidden="true"></i> 上传时间：{{ username_created[1] }}
+            </li>
+            <li type="none"><i class="fa fa-heart" aria-hidden="true" style="color: red"></i> 收藏人数：{{ counts }}</li>
+            <li type="none">
+                {% if like_result==False %}
+                <form action="/post/{{ post_id }}" method="post" style="width: 90px;display: inline">
+                    {% module xsrf_form_html() %}
+                    <button class="btn btn-success" type="submit">收藏图片</button>
+                </form>
+                {% else %}
+                <form action="/post/{{ post_id }}" method="post" style="width: 90px;display: inline">
+                    {% module xsrf_form_html() %}
+                    <button class="btn btn-danger" type="submit">取消收藏</button>
+                </form>
+                {% end %}
+                {% if follow_result != '1' %}
+                <form action="/att/{{ username_created[0] }}" method="get" style="width: 90px;display: inline">
+                    {% module xsrf_form_html() %}
+                    <button class="btn btn-primary" type="submit">关注用户</button>
+                </form>
+                {% else %}
+                <form action="/att/{{ username_created[0] }}" method="get" style="width: 90px;display: inline">
+                    {% module xsrf_form_html() %}
+                    <button class="btn btn-danger" type="submit">取消关注</button>
+                </form>
+                {% end %}
+            </li>
+        </ul>
+    </div>
 </div>
 {% end %}

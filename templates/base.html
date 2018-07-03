@@ -1,67 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
     <link rel="stylesheet" href="{{ static_url('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ static_url('font-awesome-4.7.0/css/font-awesome.css')}}">
     <title>{% block title %}Title{% end %}</title>
     <style>
-        {% block style %}
-        *{
+        {
+        %
+        block
+        style
+        %
+        }
+        * {
             padding: 0px;
             margin: 0px;
         }
-        {% end %}
+
+        {
+        %
+        end
+        %
+        }
     </style>
 </head>
 <body>
+{% if current_user%}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#"><i class="fa fa-camera" aria-hidden="true"></i> 图片</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">主页<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/exp">发现</a>
-      </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-cogs" aria-hidden="true"></i> 个人中心
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                <a class="dropdown-item" href="/info">个人信息</a>
-                <a class="dropdown-item" href="/profile">关注</a>
-                <a class="dropdown-item" href="/room">聊天室</a>
-            </div>
-        </li>
-        <li class="nav-item" style="padding: 8px">
-            <i class="fa fa-user" aria-hidden="true"></i> {{ current_user }}
-        </li>
-        <li class="nav-item">
-            <a class="nav-link disabled" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i> 登出</a>
-        </li>
-
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <button class="btn btn-warning" ><a href="/upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 上传</a></button>
-    </form>
-  </div>
+    <a class="navbar-brand" href="#"><i class="fa fa-camera" aria-hidden="true"></i> 图片</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">主页<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/exp">发现</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-cogs" aria-hidden="true"></i> 个人中心
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="/info">个人信息</a>
+                    <a class="dropdown-item" href="/profile">图片收藏</a>
+                    <a class="dropdown-item" href="/room">聊天室</a>
+                </div>
+            </li>
+            {% if current_user %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="attention" data-toggle="dropdown" aria-haspopup="true"
+                   aria-expanded="false">
+                    <i class="fa fa-users" aria-hidden="true"></i> 关注用户
+                </a>
+                <div class="dropdown-menu" aria-labelledby="attention" size="2">
+                    {% for i in ret %}
+                    <form action="/">
+                        <input type="hidden" name="username" value="{{ i }}">
+                        <button class="btn btn-light" type="submit" style="display: block;width: 158px"><i
+                                class="fa fa-user" aria-hidden="true"> {{ i }}</i></button>
+                    </form>
+                    {% end %}
+                </div>
+            </li>
+            {% end %}
+            <li class="nav-item" style="padding: 8px">
+                <i class="fa fa-user" aria-hidden="true"></i> {{ current_user }}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i> 登出</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/upload" style="margin-right:10px ">
+            {% module xsrf_form_html() %}
+            <button class="btn btn-outline-warning" type="submit"><i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                上传
+            </button>
+        </form>
+        <form class="form-inline my-2 my-lg-0" method="post" action="/search">
+            {% module xsrf_form_html() %}
+            <input class="form-control mr-sm-2" type="search" placeholder="搜索用户" aria-label="搜索用户" name="username">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
 </nav>
-    {% block body1 %}
-    content
-    {% end %}
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-{#<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>#}
-{#<script src="https://cdn.bootcss.com/popper.js/1.14.3/esm/popper.min.js"></script>#}
-{#<script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>#}
+{% end %}
+{% block body1 %}
+content
+{% end %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+{#
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+#}
+{#
+<script src="https://cdn.bootcss.com/popper.js/1.14.3/esm/popper.min.js"></script>
+#}
+{#
+<script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+#}
 {% block extra_scripts %}{% end %}
 </body>
 </html>
